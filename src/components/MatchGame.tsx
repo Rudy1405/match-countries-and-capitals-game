@@ -18,7 +18,12 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         return savedStates ? JSON.parse(savedStates) : {};
     }); // Lets save the state on the localStorage 
 
-    const [firstChoice, setFirstChoice] = useState<string | null>(null);
+    const [firstChoice, setFirstChoice] = useState<string | null>(()=>{
+        const savedFirstChoice = localStorage.getItem('firstChoice');
+        return savedFirstChoice ? savedFirstChoice : null;
+    })
+
+
     const [mistakes, setMistakes] = useState<number>(()=>{
         const savedMistakes = localStorage.getItem('mistakes');
         return savedMistakes ? Number(savedMistakes) : 0;
@@ -59,8 +64,15 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         localStorage.setItem('correctCount', correctCount.toString());
     }, [mistakes, correctCount])
 
+    useEffect(() => {
+        if (firstChoice) {
+            localStorage.setItem('firstChoice', firstChoice);
+        } else {
+            localStorage.removeItem('firstChoice');
+        }
+    }, [firstChoice]);
+
     useEffect(()=>{
-        
         const [totalPairs, possibleMistakesAttemps] = getMatchValues();  
         if (mistakes >= 3) {
             setModalValues('Sorry, you lose!');
@@ -76,7 +88,6 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
             setFirstChoice(key);
             setButtonStates((prev) => ({...prev, [key]: 'active'}));
         } else {
-
             // lets first verify when firstchoice is a country and match with a capital or firstchoice is a capital and match with a country
             if( (type === 'capital' && data[firstChoice!] === key) || (type === 'country' && data[key] === firstChoice!)) {
                 /// this means its a correct match
