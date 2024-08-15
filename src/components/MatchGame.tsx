@@ -18,7 +18,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         return savedStates ? JSON.parse(savedStates) : {};
     }); // Lets save the state on the localStorage 
 
-    const [firstChoice, setfirstChoice] = useState<string | null>(null);
+    const [firstChoice, setFirstChoice] = useState<string | null>(null);
     const [mistakes, setMistakes] = useState<number>(()=>{
         const savedMistakes = localStorage.getItem('mistakes');
         return savedMistakes ? Number(savedMistakes) : 0;
@@ -51,7 +51,24 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         }
     },[mistakes,correctCount,countryCapitalsPairs.length]);
 
-    const handleButtonClick = () => {
+    const handleButtonClick = (key: string, value: string, type: 'country' | 'capital') => {
+        if (!firstChoice) { 
+            setFirstChoice(key);
+            setButtonStates((prev) => ({...prev, [key]: 'active'}));
+        } else {
+            const isCorrect = type === 'country'
+            ? data[key] === data[firstChoice!]
+            : key === Object.keys(data).find((k) => data[k] === firstChoice!);
+
+            if (isCorrect) {
+                setButtonStates((prev) => ({...prev, [key]: 'correct', [firstChoice!]:'correct'}));
+                setCorrectCount((prev) => prev + 1);
+            } else {
+                setButtonStates((prev) => ({...prev, [key]: 'wrong', [firstChoice!]:'wrong'}));
+                setMistakes((prev) => prev + 1);
+            }
+            setFirstChoice(null);
+        }
 
     }
 
@@ -71,7 +88,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                                     <GameButton
                                         label={country}
                                         state={isValidState(countryState) ? countryState : undefined}
-                                        onClick={() => handleButtonClick()}
+                                        onClick={() => handleButtonClick(country, capital, 'country')}
                                     />
                                     );
                             })()}
@@ -84,7 +101,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                                     <GameButton
                                         label={capital}
                                         state={isValidState(capitalState) ? capitalState : undefined}
-                                        onClick={() => handleButtonClick()}
+                                        onClick={() => handleButtonClick(capital, country, 'capital')}
                                     />
                                 );
                             })()}   
