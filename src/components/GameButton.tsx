@@ -1,10 +1,16 @@
 /// This Component will render a button with the state 
 import React from "react";
+import { Button } from '@mui/material';
 
-const GameButton = () => {
+interface GameButtonProps {
+    label: string;
+    state: 'correct'| 'wrong' | 'active' | undefined; 
+}
+
+const GameButton: React.FC<GameButtonProps> = ({label, state}) => {
 
     return ( 
-        <button> button </button>
+        <Button> button </Button>
     )
 };
 
