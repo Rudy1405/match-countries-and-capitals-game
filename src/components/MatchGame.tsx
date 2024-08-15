@@ -18,6 +18,11 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         return savedStates ? JSON.parse(savedStates) : {};
     }); // Lets save the state on the localStorage 
 
+    const [firstChoice, setfirstChoice] = useState<string | null>(null);
+    const [mistakes, setMistakes] = useState<number>(()=>{
+        const savedMistakes = localStorage.getItem('mistakes');
+        return savedMistakes ? Number(savedMistakes) : 0;
+    })
     const [correctCount, setCorrectCount] = useState<number>( () => {
         const savedCorrect = localStorage.getItem('correctCount');
         return savedCorrect ? Number(savedCorrect) : 0;
@@ -29,8 +34,22 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
 
     useEffect(()=>{
         localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
+    }, [buttonStates])
+
+    useEffect(() =>{
+        localStorage.setItem('mistakes', mistakes.toString());
         localStorage.setItem('correctCount', correctCount.toString());
-    }, [buttonStates, correctCount])
+    }, [mistakes, correctCount])
+
+    useEffect(()=>{
+        if (mistakes >= 3) {
+            setGameStatus('Sorry, you lose!');
+            setOpenModal(true);
+        } else if (correctCount === countryCapitalsPairs.length) {
+            setGameStatus('You are a Geography Master, you win!');
+            setOpenModal(true);
+        }
+    },[mistakes,correctCount,countryCapitalsPairs.length]);
 
     const handleButtonClick = () => {
 
@@ -74,11 +93,11 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                 ))}
             </Grid>
             <Typography variant="body1" sx={{mt: 2}}>
-                Mistakes: 0
+                Mistakes: {mistakes}
             </Typography>
             <GameResultModal open={openModal} gameStatus={gameStatus} />
         </Box>
     );
   };
-  
+
   export default MatchGame;
