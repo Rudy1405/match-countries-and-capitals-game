@@ -6,6 +6,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+### `npm install` 
+To install the required dependencies like React and Material UI library
+in case the material UI lib doesnt install try it manually with the command: `npm install @mui/material @emotion/react @emotion/styled` 
+For more ingo you can check the documentation at: https://mui.com/material-ui/getting-started/installation/  
+
 ### `npm start`
 
 Runs the app in the development mode.\
