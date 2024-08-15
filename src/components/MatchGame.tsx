@@ -33,7 +33,35 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }
 
     return (
-        <div> Main component MatchGame </div>
+        <Box sx={{p: 3}}>
+            <Typography variant="h4" gutterBottom>
+                Match the Countries with its Capitals!
+            </Typography>
+            <Grid container spacing={2}>
+                {countryCapitalsPairs.map(([country, capital]) =>(
+                    <React.Fragment key={country}>
+                        <Grid item xs={6} md={3}>
+                            <GameButton 
+                                label={country}
+                                state={buttonStates[country]}
+                                onClick={()=> handleButtonClick()}
+                            />
+                        </Grid>
+                        <Grid item xs={6} md={3}>
+                            <GameButton 
+                                label={capital}
+                                state={buttonStates[capital]}
+                                onClick={()=> handleButtonClick()}
+                            />
+                        </Grid>
+                    </React.Fragment>
+                ))}
+            </Grid>
+            <Typography variant="body1" sx={{mt: 2}}>
+                Mistakes: 0
+            </Typography>
+            <GameResultModal open={openModal} gameStatus={gameStatus} />
+        </Box>
     );
   };
   

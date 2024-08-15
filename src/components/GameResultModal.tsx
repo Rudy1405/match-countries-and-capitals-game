@@ -11,7 +11,7 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ open, gameStatus }) =
         <Dialog open={open}>
           <DialogTitle> Game Status </DialogTitle>
           <DialogContent>
-            <Typography>
+            <Typography variant="h6" align="center">
               {gameStatus}
             </Typography>
           </DialogContent>

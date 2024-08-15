@@ -4,13 +4,22 @@ import { Button } from '@mui/material';
 
 interface GameButtonProps {
     label: string;
-    state: 'correct'| 'wrong' | 'active' | undefined; 
+    state: 'correct'| 'wrong' | 'active' | undefined;
+    onClick: () => void; 
 }
 
-const GameButton: React.FC<GameButtonProps> = ({label, state}) => {
+const GameButton: React.FC<GameButtonProps> = ({label, state, onClick}) => {
 
     return ( 
-        <Button> button </Button>
+        <Button
+            variant="contained"
+            fullWidth
+            style={{color: '#fff'}}
+            onClick={onClick}
+            disabled={state === 'correct' || state === 'wrong'}
+        > 
+        {label}
+        </Button>
     )
 };
 
