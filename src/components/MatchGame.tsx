@@ -32,6 +32,11 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     const [gameStatus, setGameStatus] = useState<string | null>(null);
     const countryCapitalsPairs = Object.entries(data);
 
+    const setModalValues = (message: string) => {
+        setGameStatus(message);
+        setOpenModal(true);
+    }
+
     useEffect(()=>{
         localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
     }, [buttonStates])
@@ -42,12 +47,13 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }, [mistakes, correctCount])
 
     useEffect(()=>{
+        const remainingUnclickedButtons = countryCapitalsPairs.length * 2 - (correctCount * 2 + mistakes);
         if (mistakes >= 3) {
-            setGameStatus('Sorry, you lose!');
-            setOpenModal(true);
+            setModalValues('Sorry, you lose!');
         } else if (correctCount === countryCapitalsPairs.length) {
-            setGameStatus('You are a Geography Master, you win!');
-            setOpenModal(true);
+            setModalValues('You are a Geography Master, you win!');
+        } else if (remainingUnclickedButtons <= 0) {
+            setModalValues('You win!');
         }
     },[mistakes,correctCount,countryCapitalsPairs.length]);
 
@@ -56,15 +62,15 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
             setFirstChoice(key);
             setButtonStates((prev) => ({...prev, [key]: 'active'}));
         } else {
-            const isCorrect = type === 'country'
-            ? data[key] === data[firstChoice!]
-            : key === Object.keys(data).find((k) => data[k] === firstChoice!);
 
-            if (isCorrect) {
-                setButtonStates((prev) => ({...prev, [key]: 'correct', [firstChoice!]:'correct'}));
+            // lets first verify when firstchoice is a country and match with a capital or firstchoice is a capital and match with a country
+            if( (type === 'capital' && data[firstChoice!] === key) || (type === 'country' && data[key] === firstChoice!)) {
+                /// this means its a correct match
+                setButtonStates((prev) => ({...prev, [key]: 'correct', [firstChoice]:'correct'}));
                 setCorrectCount((prev) => prev + 1);
             } else {
-                setButtonStates((prev) => ({...prev, [key]: 'wrong', [firstChoice!]:'wrong'}));
+                // there is a mistake
+                setButtonStates((prev) => ({...prev, [key]: 'wrong', [firstChoice]:'wrong'})); 
                 setMistakes((prev) => prev + 1);
             }
             setFirstChoice(null);
