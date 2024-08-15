@@ -1,7 +1,6 @@
 import React from 'react';
 import MatchGame from './components/MatchGame';
-import data from '../data.json'
-import logo from './logo.svg';
+import data from './data.json'
 import './App.css';
 
 
