@@ -103,6 +103,19 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
 
     }
 
+    const resetGame = () => {
+        localStorage.removeItem('buttonStates');
+        localStorage.removeItem('firstChoice');
+        localStorage.removeItem('mistakes');
+        localStorage.removeItem('correctCount');
+
+        setButtonStates({});
+        setFirstChoice(null);
+        setMistakes(0);
+        setCorrectCount(0);
+        setOpenModal(false); 
+    }
+
     return (
         <Box sx={{p: 3}}>
             <Typography variant="h4" gutterBottom>
@@ -143,7 +156,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
             <Typography variant="body1" sx={{mt: 2}}>
                 Mistakes: {mistakes}
             </Typography>
-            <GameResultModal open={openModal} gameStatus={gameStatus} />
+            <GameResultModal open={openModal} gameStatus={gameStatus} onReset={resetGame} />
         </Box>
     );
   };
