@@ -28,7 +28,7 @@ const GameButton: React.FC<GameButtonProps> = ({label, state, onClick}) => {
             fullWidth
             style={setButtonStyle()}
             onClick={onClick}
-            disabled={state === 'correct' || state === 'wrong'}
+            disabled={state === 'correct' || state === 'wrong' || state === 'active'}
         >
         {label}
         </Button>

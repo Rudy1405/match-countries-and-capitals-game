@@ -47,12 +47,13 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }, [mistakes, correctCount])
 
     useEffect(()=>{
-        const remainingUnclickedButtons = countryCapitalsPairs.length * 2 - (correctCount * 2 + mistakes);
+        const totalPairs = countryCapitalsPairs.length;
+        const possibleMistakesAttemps = totalPairs - correctCount - mistakes;
         if (mistakes >= 3) {
             setModalValues('Sorry, you lose!');
-        } else if (correctCount === countryCapitalsPairs.length) {
+        } else if (possibleMistakesAttemps <= 1) {
             setModalValues('You are a Geography Master, you win!');
-        } else if (remainingUnclickedButtons <= 0) {
+        } else if (possibleMistakesAttemps <= 2) {
             setModalValues('You win!');
         }
     },[mistakes,correctCount,countryCapitalsPairs.length]);

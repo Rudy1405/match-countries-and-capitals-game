@@ -9,7 +9,7 @@ interface GameResultModalProps {
 const GameResultModal: React.FC<GameResultModalProps> = ({ open, gameStatus }) => {
     return (
         <Dialog open={open}>
-          <DialogTitle> Game Status </DialogTitle>
+          <DialogTitle variant="h6" align="center"> GAME OVER </DialogTitle>
           <DialogContent>
             <Typography variant="h6" align="center">
               {gameStatus}
