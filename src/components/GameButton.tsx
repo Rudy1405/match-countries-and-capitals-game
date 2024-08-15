@@ -9,15 +9,27 @@ interface GameButtonProps {
 }
 
 const GameButton: React.FC<GameButtonProps> = ({label, state, onClick}) => {
+    const setButtonStyle = () => {
+        switch (state) {
+            case 'correct':
+                return {backgroundColor: '#00FF00', color: '#fff'};
+            case 'wrong':
+                return {backgroundColor: '#FF0000', color: '#fff'};
+            case 'active':
+                return {backgroundColor: '#0000FF', color: '#fff'};
+            default: 
+                return {backgroundColor: '#808080', color: '#fff'};        
+        }
+    }
 
     return ( 
         <Button
             variant="contained"
             fullWidth
-            style={{color: '#fff'}}
+            style={setButtonStyle()}
             onClick={onClick}
             disabled={state === 'correct' || state === 'wrong'}
-        > 
+        >
         {label}
         </Button>
     )
