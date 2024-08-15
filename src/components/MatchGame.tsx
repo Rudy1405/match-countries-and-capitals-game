@@ -1,5 +1,5 @@
 /// This component should handle the logic for the match of the countries and capitals from data, also state management on clicks 
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import { Box, Grid, Typography } from '@mui/material';
 
 import GameButton from "./GameButton";
@@ -37,6 +37,19 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         setOpenModal(true);
     }
 
+    const getMatchValues = useCallback(() => {
+        const totalPairs = countryCapitalsPairs.length;
+        const remainingUndefinedButtons = countryCapitalsPairs.reduce((acc, [country, capital]) => {
+            if (buttonStates[country] === undefined || buttonStates[capital] === undefined) {
+                return acc + 2; // Add 2 for both the country and capital if either is undefined
+            }
+            return acc;
+        }, 0);
+        
+        return [totalPairs, remainingUndefinedButtons / 2];
+    }, [countryCapitalsPairs, buttonStates]);
+    
+
     useEffect(()=>{
         localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
     }, [buttonStates])
@@ -47,16 +60,16 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }, [mistakes, correctCount])
 
     useEffect(()=>{
-        const totalPairs = countryCapitalsPairs.length;
-        const possibleMistakesAttemps = totalPairs - correctCount - mistakes;
+        
+        const [totalPairs, possibleMistakesAttemps] = getMatchValues();  
         if (mistakes >= 3) {
             setModalValues('Sorry, you lose!');
-        } else if (possibleMistakesAttemps <= 1) {
+        } else if (correctCount === totalPairs && mistakes === 0) {
             setModalValues('You are a Geography Master, you win!');
-        } else if (possibleMistakesAttemps <= 2) {
+        } else if (possibleMistakesAttemps + mistakes < 4 && mistakes > 0) {
             setModalValues('You win!');
         }
-    },[mistakes,correctCount,countryCapitalsPairs.length]);
+    },[mistakes, correctCount, countryCapitalsPairs.length, buttonStates, countryCapitalsPairs, getMatchValues]);
 
     const handleButtonClick = (key: string, value: string, type: 'country' | 'capital') => {
         if (!firstChoice) { 
