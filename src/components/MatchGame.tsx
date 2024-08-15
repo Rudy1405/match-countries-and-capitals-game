@@ -8,6 +8,10 @@ interface MatchGameProps {
     data:Record<string, string>
 }
 
+const isValidState = (state: string | undefined): state is 'correct'| 'wrong' | 'active' | undefined => {
+    return state === 'correct' || state === 'wrong' || state === 'active' || state === undefined;
+}
+
 const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     const [buttonStates, setButtonStates] = useState<Record<string, string>>( () => {
         const savedStates = localStorage.getItem('buttonStates');
@@ -41,18 +45,30 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                 {countryCapitalsPairs.map(([country, capital]) =>(
                     <React.Fragment key={country}>
                         <Grid item xs={6} md={3}>
-                            <GameButton 
-                                label={country}
-                                state={buttonStates[country]}
-                                onClick={()=> handleButtonClick()}
-                            />
+                            {(() => {
+                                const countryState = buttonStates[country];
+                                /// Extract of the state to a var for TS better type handling on the compiler
+                                return (
+                                    <GameButton
+                                        label={country}
+                                        state={isValidState(countryState) ? countryState : undefined}
+                                        onClick={() => handleButtonClick()}
+                                    />
+                                    );
+                            })()}
                         </Grid>
                         <Grid item xs={6} md={3}>
-                            <GameButton 
-                                label={capital}
-                                state={buttonStates[capital]}
-                                onClick={()=> handleButtonClick()}
-                            />
+                            {(() => {
+                                const capitalState = buttonStates[capital];
+                                /// Extract of the state to a var for TS better type handling on the compiler
+                                return (
+                                    <GameButton
+                                        label={capital}
+                                        state={isValidState(capitalState) ? capitalState : undefined}
+                                        onClick={() => handleButtonClick()}
+                                    />
+                                );
+                            })()}   
                         </Grid>
                     </React.Fragment>
                 ))}
