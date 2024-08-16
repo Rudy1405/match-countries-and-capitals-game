@@ -39,8 +39,10 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
 
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [gameStatus, setGameStatus] = useState<string | null>(null);
-    const countryCapitalsPairs = Object.entries(data);
-    const [shuffledPairs, setShuffledPairs] = useState<[string, string][]>(() => shuffleArray(Object.entries(data)));
+
+    const [shuffledCountries, setShuffledCountries] = useState<string[]>(() => shuffleArray(Object.keys(data)));
+    const [shuffledCapitals, setShuffledCapitals] = useState<string[]>(() => shuffleArray(Object.values(data)));
+
 
 
     const setModalValues = (message: string) => {
@@ -49,8 +51,8 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }
 
     const getMatchValues = useCallback(() => {
-        const totalPairs = shuffledPairs.length;
-        const remainingUndefinedButtons = shuffledPairs.reduce((acc, [country, capital]) => {
+        const totalPairs = Object.entries(data).length;
+        const remainingUndefinedButtons = Object.entries(data).reduce((acc, [country, capital]) => {
             if (buttonStates[country] === undefined || buttonStates[capital] === undefined) {
                 return acc + 2; // Add 2 for both the country and capital if either is undefined
             }
@@ -58,7 +60,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         }, 0);
         
         return [totalPairs, remainingUndefinedButtons / 2];
-    }, [shuffledPairs, buttonStates]);
+    }, [data, buttonStates]);
     
 
     useEffect(()=>{
@@ -78,8 +80,9 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         }
     }, [firstChoice]);
 
-    useEffect(()=>{
-        const [totalPairs, possibleMistakesAttemps] = getMatchValues();  
+    useEffect(() => {
+        const [totalPairs, possibleMistakesAttemps] = getMatchValues();
+        
         if (mistakes >= 3) {
             setModalValues('Sorry, you lose!');
         } else if (correctCount === totalPairs && mistakes === 0) {
@@ -87,7 +90,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         } else if (possibleMistakesAttemps + mistakes < 4 && mistakes > 0) {
             setModalValues('You win!');
         }
-    },[mistakes, correctCount, shuffledPairs.length, buttonStates, shuffledPairs, getMatchValues]);
+    }, [mistakes, correctCount, buttonStates, getMatchValues]);
 
     const handleButtonClick = (key: string, value: string, type: 'country' | 'capital') => {
         if (!firstChoice) { 
@@ -121,7 +124,8 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         setCorrectCount(0);
 
         if (newGame) {
-            setShuffledPairs(shuffleArray(Object.entries(data)))
+            setShuffledCountries(shuffleArray(Object.keys(data)));
+            setShuffledCapitals(shuffleArray(Object.values(data)));
         }
         setOpenModal(false); 
 
@@ -133,35 +137,37 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                 Match the Countries with its Capitals!
             </Typography>
             <Grid container spacing={2}>
-                {shuffledPairs.map(([country, capital]) =>(
-                    <React.Fragment key={country}>
-                        <Grid item xs={6} md={3}>
-                            {(() => {
-                                const countryState = buttonStates[country];
-                                /// Extract of the state to a var for TS better type handling on the compiler
-                                return (
-                                    <GameButton
-                                        label={country}
-                                        state={isValidState(countryState) ? countryState : undefined}
-                                        onClick={() => handleButtonClick(country, capital, 'country')}
-                                    />
-                                    );
-                            })()}
-                        </Grid>
-                        <Grid item xs={6} md={3}>
-                            {(() => {
-                                const capitalState = buttonStates[capital];
-                                /// Extract of the state to a var for TS better type handling on the compiler
-                                return (
-                                    <GameButton
-                                        label={capital}
-                                        state={isValidState(capitalState) ? capitalState : undefined}
-                                        onClick={() => handleButtonClick(capital, country, 'capital')}
-                                    />
-                                );
-                            })()}   
-                        </Grid>
-                    </React.Fragment>
+                {/* Render shuffled countries */}
+                {shuffledCountries.map((country) => (
+                    <Grid item xs={6} md={3} key={country}>
+                        {(() => {
+                            const countryState = buttonStates[country];
+                            const state = isValidState(countryState) ? countryState : undefined;
+                            return (
+                                <GameButton
+                                    label={country}
+                                    state={state}
+                                    onClick={() => handleButtonClick(country, data[country], 'country')}
+                                />
+                            );
+                        })()}
+                    </Grid>
+                ))}
+                {/* Render shuffled capitals */}
+                {shuffledCapitals.map((capital) => (
+                    <Grid item xs={6} md={3} key={capital}>
+                        {(() => {
+                            const capitalState = buttonStates[capital];
+                            const state = isValidState(capitalState) ? capitalState : undefined;
+                            return (
+                                <GameButton
+                                    label={capital}
+                                    state={state}
+                                    onClick={() => handleButtonClick(capital, Object.keys(data).find((key) => data[key] === capital)!, 'capital')}
+                                />
+                            );
+                        })()}
+                    </Grid>
                 ))}
             </Grid>
             <Typography variant="body1" sx={{mt: 2}}>
