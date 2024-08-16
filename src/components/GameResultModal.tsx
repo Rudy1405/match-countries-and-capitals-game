@@ -5,9 +5,10 @@ interface GameResultModalProps {
     open: boolean;
     gameStatus: string | null;
     onReset: () => void;
+    onNewGame: () => void;
 }
 
-const GameResultModal: React.FC<GameResultModalProps> = ({ open, gameStatus, onReset }) => {
+const GameResultModal: React.FC<GameResultModalProps> = ({ open, gameStatus, onReset, onNewGame }) => {
     return (
         <Dialog open={open}>
           <DialogTitle variant="h6" align="center"> GAME OVER </DialogTitle>
@@ -17,8 +18,13 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ open, gameStatus, onR
             </Typography>
           </DialogContent>
           <DialogActions>
-                <Button variant="contained" color="primary" onClick={onReset}>
-                    Play Again
+                {gameStatus !== 'You are a Geography Master, you win!' && (
+                    <Button variant="contained" color="secondary" onClick={onReset}>
+                        Retry?
+                    </Button>
+                )}
+                <Button variant="contained" color="primary" onClick={onNewGame}>
+                    Start a new Game
                 </Button>
             </DialogActions>
         </Dialog>

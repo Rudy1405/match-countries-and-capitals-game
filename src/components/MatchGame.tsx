@@ -12,6 +12,10 @@ const isValidState = (state: string | undefined): state is 'correct'| 'wrong' | 
     return state === 'correct' || state === 'wrong' || state === 'active' || state === undefined;
 }
 
+const shuffleArray = <T,>(array: T[]): T[] => {
+    return array.sort(() => Math.random() - 0.5);
+};
+
 const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     const [buttonStates, setButtonStates] = useState<Record<string, string>>( () => {
         const savedStates = localStorage.getItem('buttonStates');
@@ -36,6 +40,8 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [gameStatus, setGameStatus] = useState<string | null>(null);
     const countryCapitalsPairs = Object.entries(data);
+    const [shuffledPairs, setShuffledPairs] = useState<[string, string][]>(() => shuffleArray(Object.entries(data)));
+
 
     const setModalValues = (message: string) => {
         setGameStatus(message);
@@ -43,8 +49,8 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
     }
 
     const getMatchValues = useCallback(() => {
-        const totalPairs = countryCapitalsPairs.length;
-        const remainingUndefinedButtons = countryCapitalsPairs.reduce((acc, [country, capital]) => {
+        const totalPairs = shuffledPairs.length;
+        const remainingUndefinedButtons = shuffledPairs.reduce((acc, [country, capital]) => {
             if (buttonStates[country] === undefined || buttonStates[capital] === undefined) {
                 return acc + 2; // Add 2 for both the country and capital if either is undefined
             }
@@ -52,7 +58,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         }, 0);
         
         return [totalPairs, remainingUndefinedButtons / 2];
-    }, [countryCapitalsPairs, buttonStates]);
+    }, [shuffledPairs, buttonStates]);
     
 
     useEffect(()=>{
@@ -81,7 +87,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         } else if (possibleMistakesAttemps + mistakes < 4 && mistakes > 0) {
             setModalValues('You win!');
         }
-    },[mistakes, correctCount, countryCapitalsPairs.length, buttonStates, countryCapitalsPairs, getMatchValues]);
+    },[mistakes, correctCount, shuffledPairs.length, buttonStates, shuffledPairs, getMatchValues]);
 
     const handleButtonClick = (key: string, value: string, type: 'country' | 'capital') => {
         if (!firstChoice) { 
@@ -103,7 +109,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
 
     }
 
-    const resetGame = () => {
+    const resetGame = (newGame = false) => {
         localStorage.removeItem('buttonStates');
         localStorage.removeItem('firstChoice');
         localStorage.removeItem('mistakes');
@@ -113,7 +119,12 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
         setFirstChoice(null);
         setMistakes(0);
         setCorrectCount(0);
+
+        if (newGame) {
+            setShuffledPairs(shuffleArray(Object.entries(data)))
+        }
         setOpenModal(false); 
+
     }
 
     return (
@@ -122,7 +133,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
                 Match the Countries with its Capitals!
             </Typography>
             <Grid container spacing={2}>
-                {countryCapitalsPairs.map(([country, capital]) =>(
+                {shuffledPairs.map(([country, capital]) =>(
                     <React.Fragment key={country}>
                         <Grid item xs={6} md={3}>
                             {(() => {
@@ -156,7 +167,7 @@ const MatchGame: React.FC<MatchGameProps> = ({ data }) => {
             <Typography variant="body1" sx={{mt: 2}}>
                 Mistakes: {mistakes}
             </Typography>
-            <GameResultModal open={openModal} gameStatus={gameStatus} onReset={resetGame} />
+            <GameResultModal open={openModal} gameStatus={gameStatus} onReset={()=> resetGame(false)} onNewGame={() => resetGame(true)} />
         </Box>
     );
   };
