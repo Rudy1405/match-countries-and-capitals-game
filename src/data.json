@@ -1,8 +1,13 @@
 {
-    "Germany": "Berlin",
-    "France": "Paris",
-    "China": "Beijing",
-    "Japan": "Tokyo",
-    "India": "New Delhi"
-  }
+  "Germany": "Berlin",
+  "France": "Paris",
+  "China": "Beijing",
+  "Japan": "Tokyo",
+  "India": "New Delhi",
+  "Brazil": "Brasília",
+  "Australia": "Canberra",
+  "Canada": "Ottawa",
+  "Mexico": "Mexico City",
+  "South Africa": "Pretoria"
+}
   
